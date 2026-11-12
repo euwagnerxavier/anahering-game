@@ -176,6 +176,13 @@ kbd {
   margin-inline: auto;
 }
 
+.disclaimer.source {
+  margin-top: 6px;
+}
+.disclaimer a {
+  color: var(--gold);
+}
+
 /* ---------- HUD */
 #hud {
   position: fixed;

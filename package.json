@@ -1,8 +1,10 @@
 {
   "name": "anahering-game",
   "private": true,
+  "license": "AGPL-3.0-or-later",
   "version": "1.0.0",
   "description": "Ana Hering — The Queen: jogo 3D satírico no navegador com backend para Raspberry Pi",
+  "repository": { "type": "git", "url": "git+https://github.com/euwagnerxavier/anahering-game.git" },
   "workspaces": ["client", "server"],
   "scripts": {
     "dev": "concurrently -k -n server,client -c magenta,yellow \"npm:dev -w server\" \"npm:dev -w client\"",
