@@ -1,0 +1,32 @@
+[Unit]
+Description=Ana Hering - The Queen (servidor do Reino de Heringuia)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=anahering
+Group=anahering
+WorkingDirectory=/opt/anahering
+EnvironmentFile=/etc/anahering.env
+ExecStart=/usr/bin/node --disable-warning=ExperimentalWarning server/src/index.js
+Restart=always
+RestartSec=3
+
+# Endurecimento (o processo só escreve no diretório do banco)
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictNamespaces=true
+LockPersonality=true
+ReadWritePaths=/var/lib/anahering
+MemoryMax=300M
+
+[Install]
+WantedBy=multi-user.target

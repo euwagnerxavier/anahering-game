@@ -1,0 +1,17 @@
+{
+  "name": "anahering-game",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Ana Hering — The Queen: jogo 3D satírico no navegador com backend para Raspberry Pi",
+  "workspaces": ["client", "server"],
+  "scripts": {
+    "dev": "concurrently -k -n server,client -c magenta,yellow \"npm:dev -w server\" \"npm:dev -w client\"",
+    "build": "npm run build -w client",
+    "start": "npm start -w server",
+    "test": "npm test -w server"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.7"
+  },
+  "engines": { "node": ">=22.13" }
+}

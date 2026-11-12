@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ana Hering — The Queen</title>
+    <meta name="description" content="Jogo 3D satírico no navegador: controle a Rainha Absoluta do Reino de Heringuia." />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>" />
+  </head>
+  <body data-mode="title">
+    <div id="app"></div>
+    <div id="loading">Construindo o Reino de Heringuia…</div>
+
+    <!-- Tela de título -->
+    <section id="title-screen">
+      <div class="title-card">
+        <div class="crown-icon">👑</div>
+        <h1>ANA HERING</h1>
+        <h2>— THE QUEEN —</h2>
+        <p class="tagline">Rainha Absoluta do Reino de Heringuia. Soberana de Tudo e de Mais Um Pouco.</p>
+        <label class="nick">
+          <span>Como o reino deve chamar o seu <b>Eco Real</b>? <small>(visível para outros jogadores)</small></span>
+          <input id="nickname" maxlength="20" autocomplete="off" placeholder="Seu apelido" />
+        </label>
+        <div class="buttons">
+          <button id="btn-continue" class="btn gold hidden">Continuar Reinado</button>
+          <button id="btn-new" class="btn gold">Assumir o Trono</button>
+        </div>
+        <div class="controls">
+          <span><kbd>W A S D</kbd> mover</span><span><kbd>Mouse</kbd> câmera</span><span><kbd>Shift</kbd> correr</span>
+          <span><kbd>Espaço</kbd> pular</span><span><kbd>E</kbd> interagir</span><span><kbd>Q</kbd> acenar</span>
+          <span><kbd>M</kbd> música</span><span><kbd>Esc</kbd> pausa</span>
+        </div>
+        <p class="disclaimer">
+          Obra de ficção e sátira humorística. Personagens, falas, decretos e acontecimentos do jogo são fictícios e não
+          representam fatos reais nem opiniões de pessoas reais.
+        </p>
+      </div>
+    </section>
+
+    <!-- HUD -->
+    <section id="hud" class="hidden">
+      <div id="title-box">
+        <div class="tb-crown">👑</div>
+        <div>
+          <div class="tb-name">ANA HERING</div>
+          <div id="hud-title" class="tb-title">Rainha Absoluta</div>
+          <div class="tb-bar"><div id="hud-bar-fill"></div></div>
+          <div class="tb-meta"><span id="hud-prestige">0 de Prestígio Real</span> · <span id="hud-next"></span></div>
+        </div>
+      </div>
+      <canvas id="minimap" width="190" height="190"></canvas>
+      <div id="quest-box">
+        <div class="qb-label">⚜ Missão</div>
+        <div id="quest-title"></div>
+        <div id="quest-step"></div>
+      </div>
+      <div id="zone-name"></div>
+      <div id="prompt"></div>
+      <div id="toasts"></div>
+      <div id="announce"></div>
+      <div id="bubbles"></div>
+      <div id="lock-hint">Clique na tela para controlar a câmera com o mouse</div>
+      <div id="net-bar">
+        <div id="net-status"></div>
+        <div id="applause">👏 0 aplausos no Aplausômetro Global</div>
+      </div>
+    </section>
+
+    <!-- Diálogo -->
+    <section id="dialogue">
+      <div id="dlg-icon">⚜</div>
+      <div class="dlg-body">
+        <div class="dlg-head"><span id="dlg-name"></span> <span id="dlg-role"></span></div>
+        <div id="dlg-text"></div>
+        <div id="dlg-choices"></div>
+        <div id="dlg-hint"></div>
+      </div>
+    </section>
+
+    <!-- Decreto Real -->
+    <section id="decree-modal" class="modal">
+      <div class="modal-card">
+        <h3>📜 Decreto Real</h3>
+        <p class="muted">Dite a sua vontade. O decreto será afixado no <b>Mural de Lealdade</b>, visível a todos os reinos.</p>
+        <textarea id="decree-text" maxlength="140" rows="3" placeholder="Fica decretado que…"></textarea>
+        <div class="modal-row">
+          <span id="decree-count">0/140</span>
+          <span id="decree-status"></span>
+        </div>
+        <div class="buttons">
+          <button id="decree-cancel" class="btn">Cancelar</button>
+          <button id="decree-send" class="btn gold">Decretar!</button>
+        </div>
+        <p class="tiny">Textos impróprios são barrados pelo Conselho Real. Seja engraçada, não ofensiva.</p>
+      </div>
+    </section>
+
+    <!-- Mural de Lealdade -->
+    <section id="mural-panel" class="modal">
+      <div class="modal-card wide">
+        <h3>⚜ Mural de Lealdade</h3>
+        <ul id="mural-list"></ul>
+        <div class="buttons"><button id="mural-close" class="btn gold">Fechar</button></div>
+      </div>
+    </section>
+
+    <!-- Pausa -->
+    <section id="pause" class="modal">
+      <div class="modal-card">
+        <h3>Audiência Suspensa</h3>
+        <p class="muted">O reino inteiro congela em respeito.</p>
+        <div class="menu">
+          <button id="opt-resume" class="btn gold">Retomar o Reinado</button>
+          <button id="opt-music" class="btn">Música: ligada</button>
+          <label class="row">Qualidade gráfica
+            <select id="opt-quality">
+              <option value="high">Alta</option>
+              <option value="medium">Média</option>
+              <option value="low">Baixa</option>
+            </select>
+          </label>
+          <button id="opt-mural" class="btn">Ver Mural de Lealdade</button>
+          <button id="opt-restart" class="btn danger">Recomeçar campanha</button>
+        </div>
+        <div class="controls small">
+          <span><kbd>WASD</kbd> mover</span><span><kbd>Shift</kbd> correr</span><span><kbd>Espaço</kbd> pular</span>
+          <span><kbd>E</kbd> interagir</span><span><kbd>Q</kbd> acenar</span><span><kbd>R</kbd> decreto (no trono)</span>
+        </div>
+      </div>
+    </section>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+node_modules/
+client/dist/
+server/data/
+*.db
+*.db-*
+.env
+
+# BMAD
+_bmad/
+_bmad-output/

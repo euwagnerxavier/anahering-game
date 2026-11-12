@@ -1,0 +1,11 @@
+# /etc/cloudflared/config.yml — Cloudflare Tunnel do Reino de Heringuia
+# Substitua <TUNNEL_ID> e o hostname. WebSockets (/ws) funcionam sem configuração extra.
+tunnel: <TUNNEL_ID>
+credentials-file: /etc/cloudflared/<TUNNEL_ID>.json
+
+ingress:
+  - hostname: rainha.seudominio.com
+    service: http://127.0.0.1:3000
+    originRequest:
+      connectTimeout: 10s
+  - service: http_status:404
