@@ -50,6 +50,10 @@ const G = {
   hand: new THREE.SphereGeometry(0.05, 6, 5),
   shoe: new THREE.BoxGeometry(0.11, 0.07, 0.2),
   belt: new THREE.TorusGeometry(0.21, 0.025, 4, 14),
+  detail: new THREE.SphereGeometry(1, 8, 6),
+  seam: new THREE.BoxGeometry(1, 1, 1),
+  collar: new THREE.TorusGeometry(0.09, 0.025, 5, 12),
+  cuff: new THREE.CylinderGeometry(0.058, 0.058, 0.06, 8),
 };
 
 /**
@@ -63,6 +67,8 @@ export function buildNPCModel(look) {
   inner.scale.setScalar(scale);
   root.add(inner);
   const mat = material();
+  const trim = look.trim ?? 0x6b4426;
+  const hair = look.hatColor ?? 0x6b4426;
 
   // pernas
   const legs = [];
@@ -70,6 +76,8 @@ export function buildNPCModel(look) {
     const pivot = new THREE.Group();
     pivot.position.set(0.1 * s, 0.58, 0);
     const p = new Parts().add(G.leg, look.dress ? look.tunic : 0x3b2f2a, [0, -0.27, 0]).add(G.shoe, 0x2a1d14, [0, -0.54, 0.04]);
+    p.add(G.seam, 0x17120f, [0, -0.568, 0.04], [0, 0, 0], [0.115, 0.018, 0.205]);
+    p.add(G.seam, trim, [0, -0.515, 0.105], [0, 0, 0], [0.045, 0.024, 0.016]);
     const m = new THREE.Mesh(p.build(), mat);
     m.castShadow = true;
     pivot.add(m);
@@ -86,8 +94,21 @@ export function buildNPCModel(look) {
   else T.add(G.tunic, look.tunic, [0, 0.12, 0]);
   T.add(G.chest, look.tunic, [0, 0.58, 0]);
   T.add(G.belt, look.trim ?? 0x6b4426, [0, 0.38, 0], [Math.PI / 2, 0, 0]);
+  T.add(G.collar, 0xeee2c8, [0, 0.795, 0], [Math.PI / 2, 0, 0]);
+  T.add(G.seam, trim, [0, 0.38, 0.223], [0, 0, 0], [0.075, 0.06, 0.025]);
+  for (const y of [0.48, 0.59, 0.7]) {
+    T.add(G.detail, trim, [0, y, look.tabard ? 0.229 : 0.21], [0, 0, 0], [0.014, 0.014, 0.009]);
+  }
   T.add(G.head, look.skin, [0, 1.0, 0]);
-  for (const s of [-1, 1]) T.add(G.eye, 0x1a1210, [0.05 * s, 1.02, 0.135]);
+  for (const s of [-1, 1]) {
+    T.add(G.detail, look.skin, [0.145 * s, 0.99, 0], [0, 0, 0], [0.025, 0.039, 0.024]);
+    T.add(G.eye, 0xfff4df, [0.05 * s, 1.02, 0.135], [0, 0, 0], [1.2, 0.85, 0.65]);
+    T.add(G.detail, 0x251b17, [0.05 * s, 1.02, 0.146], [0, 0, 0], [0.009, 0.012, 0.005]);
+    T.add(G.detail, 0xffffff, [0.05 * s - 0.003, 1.025, 0.151], [0, 0, 0], [0.003, 0.003, 0.002]);
+    T.add(G.seam, hair, [0.05 * s, 1.055, 0.134], [0, 0, -0.12 * s], [0.043, 0.009, 0.012]);
+  }
+  T.add(G.detail, look.skin, [0, 0.99, 0.15], [0, 0, 0], [0.022, 0.027, 0.028]);
+  T.add(G.detail, new THREE.Color(look.skin).multiplyScalar(0.55), [0, 0.946, 0.14], [0, 0, 0], [0.026, 0.006, 0.006]);
   // chapéus
   const hc = look.hatColor ?? 0x6b4426;
   switch (look.hat) {
@@ -141,6 +162,7 @@ export function buildNPCModel(look) {
     const pivot = new THREE.Group();
     pivot.position.set(0.27 * s, 0.76, 0);
     const A = new Parts().add(G.limb, look.tunic, [0, -0.24, 0]).add(G.hand, look.skin, [0, -0.5, 0]);
+    A.add(G.cuff, trim, [0, -0.435, 0]);
     if (s === 1 && look.trumpet) {
       A.add(new THREE.CylinderGeometry(0.02, 0.02, 0.6, 6), 0xf2c14e, [0, -0.5, 0.28], [Math.PI / 2, 0, 0]);
       A.add(new THREE.ConeGeometry(0.1, 0.18, 10, 1, true), 0xf2c14e, [0, -0.5, 0.62], [-Math.PI / 2, 0, 0]);

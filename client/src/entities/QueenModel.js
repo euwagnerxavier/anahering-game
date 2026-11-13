@@ -30,6 +30,7 @@ function makeMaterials(variant, shared) {
     skin: std({ color: PALETTE.skin, roughness: 0.6 }),
     hair: std({ color: PALETTE.hair, roughness: 0.55 }),
     eye: std({ color: 0x1d1410, roughness: 0.2 }),
+    pearl: std({ color: 0xfff3df, roughness: 0.28, metalness: 0.12 }),
     lips: std({ color: 0xb8334a, roughness: 0.5 }),
     gemRed: std({ color: 0xff1f4b, emissive: 0xff0033, emissiveIntensity: 20, roughness: 0.1 }),
     gemBlue: std({ color: 0x2f7bff, emissive: 0x1d5cff, emissiveIntensity: 20, roughness: 0.1 }),
@@ -75,6 +76,21 @@ export class QueenModel {
     add(skirtPivot, new THREE.TorusGeometry(0.5, 0.018, 6, 36), M.gold, [0, -0.55, 0], [Math.PI / 2, 0, 0], [1.03, 1.03, 1]);
     // painel frontal dourado
     add(skirtPivot, new THREE.BoxGeometry(0.16, 0.9, 0.02), M.gold, [0, -0.5, 0.46], [-0.33, 0, 0]);
+    // Bordado acompanha o perfil do sino, sem atravessar o tecido.
+    for (const s of [-1, 1]) {
+      const seam = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(s * 0.08, -0.08, 0.302),
+        new THREE.Vector3(s * 0.15, -0.36, 0.42),
+        new THREE.Vector3(s * 0.23, -0.62, 0.52),
+        new THREE.Vector3(s * 0.3, -0.94, 0.59),
+      ]);
+      add(skirtPivot, new THREE.TubeGeometry(seam, 16, 0.009, 5, false), M.gold);
+    }
+    for (let i = 0; i < 12; i++) {
+      const a = i * Math.PI * 2 / 12;
+      add(skirtPivot, new THREE.SphereGeometry(0.018, 8, 6), M.pearl,
+        [Math.sin(a) * 0.65, -0.88, Math.cos(a) * 0.65]);
+    }
 
     // tronco superior
     const chest = (this.chest = new THREE.Group());
@@ -102,7 +118,14 @@ export class QueenModel {
     add(head, new THREE.SphereGeometry(0.06, 10, 8), M.hair, [0, 0.06, -0.15]); // coque
     // rosto
     for (const s of [-1, 1]) {
-      add(head, new THREE.SphereGeometry(0.018, 8, 6), M.eye, [0.05 * s, 0.02, 0.128], [0, 0, 0], [1, 1.1, 0.6]);
+      add(head, new THREE.SphereGeometry(0.022, 10, 8), M.pearl, [0.05 * s, 0.02, 0.129], [0, 0, 0], [1, 0.75, 0.5]);
+      add(head, new THREE.SphereGeometry(0.013, 8, 6), M.eye, [0.05 * s, 0.02, 0.14], [0, 0, 0], [1, 1, 0.5]);
+      add(head, new THREE.SphereGeometry(0.004, 6, 4), M.pearl, [0.05 * s - 0.004, 0.025, 0.147]);
+      add(head, new THREE.SphereGeometry(0.027, 10, 8), M.skin, [0.14 * s, -0.015, 0], [0, 0, 0], [0.5, 1, 0.7]);
+      add(head, new THREE.SphereGeometry(0.012, 8, 6), M.pearl, [0.145 * s, -0.05, 0.012]);
+      // Mechas laterais preservam a leitura do rosto sob a coroa.
+      add(head, new THREE.CapsuleGeometry(0.025, 0.14, 4, 8), M.hair,
+        [0.125 * s, -0.045, -0.025], [0, 0, -0.15 * s]);
       add(head, new THREE.BoxGeometry(0.05, 0.008, 0.01), M.hair, [0.05 * s, 0.06, 0.135], [0, 0, -0.15 * s]); // sobrancelhas altivas
     }
     add(head, new THREE.SphereGeometry(0.02, 8, 6), M.skin, [0, -0.02, 0.145], [0, 0, 0], [0.8, 1, 0.9]); // nariz
